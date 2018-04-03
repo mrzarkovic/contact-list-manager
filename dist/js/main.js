@@ -46098,6 +46098,8 @@ const ReactDOM = require('react-dom');
 const App = require('./components/App');
 const AppAPI = require('./utils/appAPI');
 
+AppAPI.getContacts();
+
 ReactDOM.render(
     React.createElement(App, null), 
     document.getElementById('app')
@@ -46122,6 +46124,10 @@ const AppStore = assign({}, EventEmitter.prototype, {
     
     saveContact: function (contact) {
         _contacts.push(contact);
+    },
+
+    setContacts: function (contacts) {
+        _contacts = contacts;
     },
     
     emitChange: function () {
@@ -46149,6 +46155,15 @@ AppDispatcher.register(function (payload) {
 
             // Save to API
             AppAPI.saveContact(action.contact);
+
+            // Emit Change
+            AppStore.emitChange();
+            break;
+        case AppConstants.RECEIVE_CONTACT:
+            console.log('Receiving Contact...');
+
+            // Store Save
+            AppStore.setContacts(action.contacts);
 
             // Emit Change
             AppStore.emitChange();
@@ -46187,14 +46202,14 @@ module.exports = {
             let contacts = [];
             snapshot.forEach(function (childSnapshot) {
                 let contact = {
-                    id: childSnapshot.key(),
+                    id: childSnapshot.key,
                     name: childSnapshot.val().contact.name,
                     phone: childSnapshot.val().contact.phone,
                     email: childSnapshot.val().contact.email
                 }
                 contacts.push(contact);
-                AppActions.receiveContacts(contacts);
             });
+            AppActions.receiveContacts(contacts);
         });
     }
 };
