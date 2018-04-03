@@ -33,5 +33,10 @@ module.exports = {
             });
             AppActions.receiveContacts(contacts);
         });
+    },
+
+    removeContact: function (contactId) {
+        let database = firebaseApp.database();
+        database.ref('contacts/' + contactId).remove();
     }
 };
